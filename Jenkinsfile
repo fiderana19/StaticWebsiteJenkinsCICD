@@ -10,7 +10,13 @@ pipeline{
         DOCKERHUB_PASSWORD = credentials('dockerhub_password')
     }
     agent none
+    
     stages{
+        stage('Setup Tools') {
+            steps {
+                sh 'apk add --no-cache docker-cli'
+            }
+        }
         stage("Build image"){
             agent any
             steps{

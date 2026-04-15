@@ -3,11 +3,11 @@ pipeline{
         IMAGE_NAME = "static_website"
         APP_CONTAINER_PORT = "80"
         APP_EXPOSED_PORT = "80"
-        IMAGE_TAG = ""
-        STAGING = ""
-        PRODUCTION = ""
-        DOCKERHUB_ID = ""
-        DOCKERHUB_PASSWORD = ""
+        IMAGE_TAG = "latest"
+        STAGING = "fideo_staging"
+        PRODUCTION = "fideo_prod"
+        DOCKERHUB_ID = "fiderana19"
+        DOCKERHUB_PASSWORD = credentials('dockerhub_password')
     }
     agent none
     stages{
@@ -15,9 +15,9 @@ pipeline{
             agent any
             steps{
                 script{
-                    sh ```
+                    sh '''
                         docker build -t ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG .
-                    ```
+                    '''
                 }
             }
         }
@@ -25,12 +25,12 @@ pipeline{
             agent any
             steps{
                 script{
-                    sh ```
+                    sh '''
                         echo "Cleaning existing container if exists"
                         docker ps -a | grep -i $IMAGE_NAME && docker rm -f $IMAGE_NAME
                         docker run -d --name $IMAGE_NAME -p $APP_EXPOSED_PORT:$APP_CONTAINER_PORT -e PORT=$APP_CONTAINER_PORT ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG
                         sleep 5
-                    ```
+                    '''
                 }
             }
         }
@@ -38,9 +38,9 @@ pipeline{
             agent any
             steps{
                 script{
-                    sh ```
+                    sh '''
                         curl localhost | grep -i "Dimension"                    
-                    ```
+                    '''
                 }
             }
         }
@@ -48,10 +48,10 @@ pipeline{
             agent any
             steps{
                 script{
-                    sh ```
+                    sh '''
                         docker stop $IMAGE_NAME
                         docker rm $IMAGE_NAME
-                    ```
+                    '''
                 }
             }
         }
@@ -59,10 +59,10 @@ pipeline{
             agent any
             steps{
                 script{
-                    sh ```
+                    sh '''
                         echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_ID --password-stdin
                         docker push ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG
-                    ```
+                    '''
                 }
             }
         }
@@ -73,19 +73,13 @@ pipeline{
             agent{
                 docker ( image 'franela/dind' )
             }
-            environment{
-                HEROKU_API_KEY = credentials("heroku_api_key")
-            }
             steps{
                 script{
-                    sh ```
-                        apk --no-cache add npm
-                        npm install -g heroku
-                        heroku container:login
-                        heroku create $STAGING || echo "Project already exist"
-                        heroku container:push -a $STAGING web
-                        heroku container:release -a $STAGING web                        
-                    ```
+                    sh '''
+                        echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_ID --password-stdin
+                        docker image tag ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG-staging
+                        docker push ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG:$IMAGE_TAG-staging
+                    '''
                 }
             }
         }
@@ -96,19 +90,13 @@ pipeline{
             agent{
                 docker ( image 'franela/dind' )
             }
-            environment{
-                HEROKU_API_KEY = credentials("heroku_api_key")
-            }
             steps{
                 script{
-                    sh ```
-                        apk --no-cache add npm
-                        npm install -g heroku
-                        heroku container:login
-                        heroku create $PRODUCTION || echo "Project already exist"
-                        heroku container:push -a $PRODUCTION web
-                        heroku container:release -a $PRODUCTION web                        
-                    ```
+                    sh '''
+                        echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_ID --password-stdin
+                        docker image tag ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG-prod
+                        docker push ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG:$IMAGE_TAG-prod
+                    '''
                 }
             }
         }        

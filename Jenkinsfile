@@ -90,7 +90,9 @@ pipeline{
                 expression ( GIT_BRANCH === "origin/main" )
             }
             agent{
-                docker ( image 'franela/dind' )
+                docker {
+                    image 'franela/dind'
+                }
             }
             steps{
                 script{

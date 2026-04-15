@@ -35,7 +35,7 @@ pipeline{
                     sh '''
                         echo "Cleaning existing container if exists"
                         docker ps -a | grep -i $IMAGE_NAME && docker rm -f $IMAGE_NAME
-                        docker run -d --name $IMAGE_NAME -p $APP_EXPOSED_PORT:$APP_CONTAINER_PORT -e PORT=$APP_CONTAINER_PORT ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG
+                        docker run -d --name $IMAGE_NAME -p $APP_EXPOSED_PORT:$APP_CONTAINER_PORT ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG
                         sleep 5
                     '''
                 }
@@ -47,7 +47,7 @@ pipeline{
                 script{
                     sh '''
                         docker ps
-                        curl localhost:$APP_EXPOSED_PORT | grep -i "Dimension"                    
+                        curl http://localhost:$APP_EXPOSED_PORT | grep -i "Dimension"                    
                     '''
                 }
             }

@@ -2,7 +2,7 @@ pipeline{
     environment{
         IMAGE_NAME = "static_website"
         APP_CONTAINER_PORT = "80"
-        APP_EXPOSED_PORT = "80"
+        APP_EXPOSED_PORT = "9999"
         IMAGE_TAG = "latest"
         STAGING = "fideo_staging"
         PRODUCTION = "fideo_prod"

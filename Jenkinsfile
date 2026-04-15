@@ -68,11 +68,12 @@ pipeline{
         }
         stage("Push image in staging and deploy it"){
             when{
-                expression ( GIT_BRANCH === "origin/main" )
+                expression { env.BRANCH_NAME == 'main' }
             }
             agent{
                 docker {
                     image 'franela/dind'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
             steps{
@@ -87,11 +88,12 @@ pipeline{
         }
         stage("Push image in production and deploy it"){
             when{
-                expression ( GIT_BRANCH === "origin/main" )
+                expression { env.BRANCH_NAME == 'main' }
             }
             agent{
                 docker {
                     image 'franela/dind'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
             steps{

@@ -13,6 +13,7 @@ pipeline{
     
     stages{
         stage('Setup Tools') {
+            agent any
             steps {
                 sh 'apk add --no-cache docker-cli'
             }

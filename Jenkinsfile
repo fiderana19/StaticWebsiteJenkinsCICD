@@ -40,8 +40,7 @@ pipeline{
             steps{
                 script{
                     sh '''
-                        docker ps
-                        curl http://192.168.99.10:$APP_EXPOSED_PORT | grep -i "Dimension"                    
+                        curl http://172.17.0.1:$APP_EXPOSED_PORT | grep -i "Dimension"                    
                     '''
                 }
             }

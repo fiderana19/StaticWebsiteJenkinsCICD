@@ -12,10 +12,10 @@ pipeline{
     agent none
     
     stages{
-        stage('Setup Tools') {
+        stage('Checking docker') {
             agent any
             steps {
-                sh 'apk add --no-cache docker-cli'
+                sh 'docker --version'
             }
         }
         stage("Build image"){

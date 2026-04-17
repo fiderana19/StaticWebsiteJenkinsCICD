@@ -12,12 +12,6 @@ pipeline{
     agent none
     
     stages{
-        stage('Checking docker') {
-            agent any
-            steps {
-                sh 'docker --version'
-            }
-        }
         stage("Build image"){
             agent any
             steps{
@@ -47,7 +41,7 @@ pipeline{
                 script{
                     sh '''
                         docker ps
-                        curl http://host.docker.internal:$APP_EXPOSED_PORT | grep -i "Dimension"                    
+                        curl http://192.168.99.10:$APP_EXPOSED_PORT | grep -i "Dimension"                    
                     '''
                 }
             }
@@ -89,8 +83,8 @@ pipeline{
                     sh '''
                         echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_ID --password-stdin
                         docker image tag ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG-staging
-                        docker push ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG:$IMAGE_TAG-staging
-                    '''
+                        '''
+                    // docker push ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG:$IMAGE_TAG-staging
                 }
             }
         }
@@ -109,8 +103,8 @@ pipeline{
                     sh '''
                         echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_ID --password-stdin
                         docker image tag ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG-prod
-                        docker push ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG:$IMAGE_TAG-prod
-                    '''
+                        '''
+                    // docker push ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG:$IMAGE_TAG-prod
                 }
             }
         }        
